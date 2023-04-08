@@ -4,8 +4,9 @@ import { HomeComponent } from './home/home.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
-  { path: 'signup', loadChildren: () => import('./signup/signup.module').then(m => m.SignupModule)}
-  ];
+  { path: 'signup', loadChildren: () => import('./signup/signup.module').then(m => m.SignupModule) },
+  { path: 'dashboard', loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule) }
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
