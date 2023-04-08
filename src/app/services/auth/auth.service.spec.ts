@@ -8,6 +8,11 @@ import {
 
 import { of } from 'rxjs'
 import { SignupComponent } from 'src/app/signup/signup.component';
+import { JwtModule, JwtHelperService } from '@auth0/angular-jwt';
+
+function tokenGetter() {
+  return localStorage.getItem('Authorization');
+}
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -15,8 +20,14 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [AuthService]
+      imports: [
+        HttpClientTestingModule,
+        JwtModule.forRoot({
+          config: {
+            tokenGetter: tokenGetter
+          }
+        })],
+      providers: [AuthService, JwtHelperService]
     });
 
     authService = TestBed.get(AuthService);
@@ -41,7 +52,7 @@ describe('AuthService', () => {
         "dietPreferences": []
       };
 
-      const loginResponse ={
+      const loginResponse = {
         'token': 's3cr3tt0ken'
       }
       let response: any;
@@ -62,7 +73,7 @@ describe('AuthService', () => {
       const signupResponse = 'Your Password must be at least 5 characters long.';
       let errorResponse: any;
 
-      authService.signup(user).subscribe(res => {}, err => {
+      authService.signup(user).subscribe(res => { }, err => {
         errorResponse = err;
       });
 
@@ -77,7 +88,7 @@ describe('AuthService', () => {
 
   describe('login', () => {
     it('should return a token with a valid username and password', () => {
-      const user = { 'username': 'myUser', 'password': 'password'};
+      const user = { 'username': 'myUser', 'password': 'password' };
       const loginResponse = { 'token': 's3cr3tt0ken' };
       let response: any;
 
@@ -88,6 +99,20 @@ describe('AuthService', () => {
       expect(response).toEqual(loginResponse);
       expect(localStorage.getItem('Authorization')).toEqual('s3cr3tt0ken');
       http.verify();
+    });
+  });
+
+  describe('isLoggedin', () => {
+    it('should return true if the user is logged in', () => {
+      localStorage.setItem('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
+        'eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.' +
+        'TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ');
+      expect(authService.isLoggedIn()).toEqual(true);
+    });
+
+    it('should return false if the user is not logged in', () => {
+      localStorage.removeItem('Authorization');
+      expect(authService.isLoggedIn()).toEqual(false);
     });
   });
 });
