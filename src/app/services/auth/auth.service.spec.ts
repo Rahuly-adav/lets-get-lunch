@@ -17,6 +17,7 @@ function tokenGetter() {
 describe('AuthService', () => {
   let authService: AuthService;
   let http: HttpTestingController;
+  let jwtHelper: JwtHelperService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -32,6 +33,7 @@ describe('AuthService', () => {
 
     authService = TestBed.get(AuthService);
     http = TestBed.get(HttpTestingController);
+    jwtHelper = TestBed.get(JwtHelperService);
   });
 
   it('should be created', () => {
@@ -95,9 +97,11 @@ describe('AuthService', () => {
       authService.login(user).subscribe(res => {
         response = res;
       });
+      spyOn(authService.loggedIn, 'emit');
       http.expectOne('http://localhost:3000/api/sessions').flush(loginResponse);
       expect(response).toEqual(loginResponse);
       expect(localStorage.getItem('Authorization')).toEqual('s3cr3tt0ken');
+      expect(authService.loggedIn.emit).toHaveBeenCalled();
       http.verify();
     });
   });
@@ -113,6 +117,39 @@ describe('AuthService', () => {
     it('should return false if the user is not logged in', () => {
       localStorage.removeItem('Authorization');
       expect(authService.isLoggedIn()).toEqual(false);
+    });
+  });
+
+  describe('log out', () => {
+    it('should clear the token from localstorage', () => {
+      spyOn(authService.loggedIn, 'emit');
+
+      localStorage.setItem('Authorization', 's3cr3tt0ken');
+      expect(localStorage.getItem('Authorization')).toEqual('s3cr3tt0ken');
+
+      authService.logout();
+
+      expect(localStorage.getItem('Authorization')).toBeFalsy();
+      expect(authService.loggedIn.emit).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe('currentUser', () => {
+    it('should return a user object with a valid token', () => {
+      spyOn(localStorage, 'getItem').and.callFake(() => 's3cr3tt0ken');
+      spyOn(jwtHelper, 'decodeToken').and.callFake(() => {
+        return {
+          exp: 1517847480,
+          iat: 1517840280,
+          username: 'username',
+          _id: '5a6f41c94000495518d2673f'
+        } as any;
+      });
+      const res = authService.currentUser();
+
+      expect(localStorage.getItem).toHaveBeenCalled();
+      expect(res.username).toBeDefined();
+      expect(res._id).toBeDefined();
     });
   });
 });
