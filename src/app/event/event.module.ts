@@ -5,9 +5,10 @@ import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime-ex'
 
 import { EventRoutingModule } from './event-routing.module';
 import { EventCreateComponent } from './event-create/event-create.component';
+import { EventViewComponent } from './event-view/event-view.component';
 
 @NgModule({
-  declarations: [EventCreateComponent],
+  declarations: [EventCreateComponent, EventViewComponent],
   imports: [
     CommonModule,
     EventRoutingModule,

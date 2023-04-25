@@ -6,7 +6,6 @@ import {
   HttpTestingController
 } from '@angular/common/http/testing';
 import { HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { Console } from 'console';
 
 describe('AuthInterceptorService', () => {
   let http: HttpTestingController;

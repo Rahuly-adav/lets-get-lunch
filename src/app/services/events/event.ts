@@ -4,8 +4,8 @@ export interface Event {
     description: string;
     city: string;
     state: string;
-    startTime: string;
-    endTime: string;
+    startTime: any;
+    endTime: any;
     suggestLocations: Boolean;
 
     members?: Array<any>;
