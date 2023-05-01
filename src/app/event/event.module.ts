@@ -8,9 +8,11 @@ import { EventCreateComponent } from './event-create/event-create.component';
 import { EventViewComponent } from './event-view/event-view.component';
 import { CommentCreateModule } from '../comment-create/comment-create.module';
 import { MemberListModule } from '../member-list/member-list.module';
+import { RecommendationsListModule } from '../recommendations-list/recommendations-list.module';
+import { EventUpdateComponent } from './event-update/event-update.component';
 
 @NgModule({
-  declarations: [EventCreateComponent, EventViewComponent],
+  declarations: [EventCreateComponent, EventViewComponent, EventUpdateComponent],
   imports: [
     CommonModule,
     EventRoutingModule,
@@ -19,7 +21,8 @@ import { MemberListModule } from '../member-list/member-list.module';
     OwlDateTimeModule,
     OwlNativeDateTimeModule,
     CommentCreateModule,
-    MemberListModule
+    MemberListModule,
+    RecommendationsListModule
   ]
 })
 export class EventModule { }

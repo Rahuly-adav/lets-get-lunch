@@ -12,11 +12,11 @@ Cypress.Commands.add('createEvent', (name: string,location,opts = {}) => {
     .get('input[formControlName=location]').type(location)
     .get('input[formControlName=startTime]').click()
       .get('.owl-dt-calendar-cell-today').click()
-      .get('.owl-dt-container-buttons button').last().wait(1000).click()
+      .get('.owl-dt-container-buttons button').last().wait(2000).click().wait(2000)
     .get('input[formControlName=endTime]').click()
       .get('.owl-dt-calendar-cell-today').click()
-      .get('[aria-label="Add a hour"]').click()
-      .get('.owl-dt-container-buttons button').last().wait(1000).click();
+      // .get('[aria-label="Add a hour"]').click()
+      .get('.owl-dt-container-buttons button').last().wait(2000).click().wait(2000);
 
     if (suggestLocations) {
         cy.get('#suggest-true').click();

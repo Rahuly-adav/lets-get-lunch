@@ -115,6 +115,11 @@ describe('MemberListComponent', () => {
       const members = fixture.debugElement.queryAll(By.css('.member'));
       expect(members[0].nativeElement.textContent).toEqual('newUser');
     });
+
+    it('should display update the member list header', () => {
+      const header = fixture.debugElement.query(By.css('h3'));
+      expect(header.nativeElement.textContent).toEqual('Your Event members');
+    });
   });
 
   describe('viewed by a non-event creator', () => {

@@ -1,4 +1,4 @@
-<h3>Event members</h3>
+<h3><span *ngIf="isCreator">Your </span>Event members</h3>
 <div *ngIf="!isCreator" class="event-subscribe">
     <div class="form-group">
         <button data-test="subscribe" class="btn btn-primary" type="button" *ngIf="!isMember"
