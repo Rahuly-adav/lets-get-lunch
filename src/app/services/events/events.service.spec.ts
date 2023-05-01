@@ -6,6 +6,16 @@ import {
   HttpTestingController
 } from '@angular/common/http/testing';
 import { Event } from './event';
+import { AuthService } from '../auth/auth.service';
+
+class MockAuthService {
+  currentUser = jasmine.createSpy('currentUser').and.callFake(() => {
+    return {
+      'username': 'johndoe',
+      '_id': '58dab4f21342131b8c96787f'
+    };
+  });
+}
 
 describe('EventsService', () => {
   let service: EventsService;
@@ -13,7 +23,11 @@ describe('EventsService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        EventsService,
+        { provide: AuthService, useClass: MockAuthService }
+      ]
     });
 
     service = TestBed.inject(EventsService);
@@ -140,25 +154,25 @@ describe('EventsService', () => {
 
   describe('get', () => {
     it('should return an event object with a valid event id', () => {
-      const eventResponse: Event = {
+      const eventResponse: any = {
         '_id': '5a55135639fbc4ca3ee0ce5a',
-      '_creator': '5a550ea739fbc4ca3ee0ce58',
-      'title': 'My first event',
-      'description': 'My first description',
-      'city': 'Atlanta',
-      'state': 'GA',
-      'startTime': '2018-01-09T19:00:00.000Z',
-      'endTime': '2018-01-09T20:00:00.000Z',
-      '__v': 0,
-      'suggestLocations': true,
-      'members': [
-        {
-          '_id': '5a550ea739fbc4ca3ee0ce58',
-          'username': 'newUser',
-          '__v': 0,
-          'dietPreferences': []
-        }
-      ]
+        '_creator': '5a550ea739fbc4ca3ee0ce58',
+        'title': 'My first event',
+        'description': 'My first description',
+        'city': 'Atlanta',
+        'state': 'GA',
+        'startTime': '2018-01-09T19:00:00.000Z',
+        'endTime': '2018-01-09T20:00:00.000Z',
+        '__v': 0,
+        'suggestLocations': true,
+        'members': [
+          {
+            '_id': '5a550ea739fbc4ca3ee0ce58',
+            'username': 'newUser',
+            '__v': 0,
+            'dietPreferences': []
+          }
+        ]
       };
       const eventId = '5a55135639fbc4ca3ee0ce5a';
       let response;
@@ -168,8 +182,8 @@ describe('EventsService', () => {
       });
       spyOn(service, 'formatDateTime').and.callThrough();
 
-      http.expectOne('http://localhost:3000/api/events/'+eventId)
-      .flush(eventResponse);
+      http.expectOne('http://localhost:3000/api/events/' + eventId)
+        .flush(eventResponse);
 
       expect(service.formatDateTime).toHaveBeenCalled();
       expect(response).toEqual(eventResponse);
@@ -178,17 +192,137 @@ describe('EventsService', () => {
 
     it('should return a 404 for an event id that does not exist', () => {
       const eventError = 'This event does not exist.';
-      let errorResponse:any;
+      let errorResponse: any;
 
-      service.get('1234').subscribe(res => {}, err => {
+      service.get('1234').subscribe(res => { }, err => {
         errorResponse = err;
       });
 
       http.expectOne('http://localhost:3000/api/events/' + '1234')
-      .flush({message: eventError}, {status: 404, statusText: 'Not Found'});
+        .flush({ message: eventError }, { status: 404, statusText: 'Not Found' });
 
       expect(errorResponse.error.message).toEqual(eventError);
       http.verify();
     });
   });
+
+  describe('all', () => {
+    it('should return an array of all events', () => {
+      const events: Array<Event> = [{
+        '_id': '5a539459b689d341cccc4be8',
+        '_creator': '5a539449b689d341cccc4be7',
+        'title': 'Another event',
+        'description': 'Another event description',
+        'city': 'Atlanta',
+        'state': 'GA',
+        'startTime': '2018-01-08T05:00:00.000Z',
+        'endTime': '2018-01-09T05:00:00.000Z',
+        '__v': 0,
+        'suggestLocations': false,
+        'members': [
+          '5a539449b689d341cccc4be7'
+        ]
+      }];
+      let response;
+
+      service.all().subscribe(res => {
+        response = res;
+      });
+
+      http
+        .expectOne('http://localhost:3000/api/events')
+        .flush(events);
+      expect(response).toEqual(events);
+      http.verify();
+    });
+
+    it('should return an error if there\'s a server error', () => {
+      const error = 'Something went wrong!';
+      let errorResponse;
+
+      service.all().subscribe(res => { }, err => {
+        errorResponse = err;
+      });
+
+      http
+        .expectOne('http://localhost:3000/api/events')
+        .flush({ message: error }, { status: 500, statusText: 'Server Error' });
+      expect(errorResponse.error.message).toEqual(error);
+      http.verify();
+    });
+  });
+
+  describe('isEventCreator', () => {
+    it('should return true if the event creator is the current user', () => {
+      const id = '58dab4f21342131b8c96787f';
+      expect(service.isEventCreator(id)).toEqual(true);
+    });
+    it('should return false if the event creator is not the current user', () => {
+      const id = '12345';
+      expect(service.isEventCreator(id)).toEqual(false);
+    });
+  });
+
+  describe('subscribe', () => {
+    it('should return an event with an updated members list', () => {
+      const eventId = '5a55135639fbc4ca3ee0ce5a';
+      const subscriber = { user: '5a539449b689d341cccc4be7' };
+      const subscribeResponse: Event = {
+        '_id': '5a55135639fbc4ca3ee0ce5a',
+        '_creator': '5a550ea739fbc4ca3ee0ce58',
+        'title': 'My first updated event',
+        'description': 'My first updated description',
+        'city': 'Miami',
+        'state': 'FL',
+        'startTime': '2018-01-09T19:00:00.000Z',
+        'endTime': '2018-01-09T20:00:00.000Z',
+        '__v': 1,
+        'suggestLocations': true,
+        'members': [
+          {
+            '_id': '5a550ea739fbc4ca3ee0ce58',
+            'username': 'newUser',
+            '__v': 0,
+            'dietPreferences': []
+          },
+          {
+            '_id': '5a539449b689d341cccc4be7',
+            'username': 'adam',
+            '__v': 0,
+            'dietPreferences': []
+          }
+        ]
+      };
+      let response;
+  
+      service.subscribe(eventId, subscriber).subscribe(res => {
+        response = res;
+      });
+  
+      http
+        .expectOne('http://localhost:3000/api/events/' + eventId + '/subscribe')
+        .flush(subscribeResponse);
+      expect(response).toEqual(subscribeResponse);
+      http.verify();
+    });
+
+    it('should return an error if a user cannot be subscribed to an event', () => {
+      const eventId = '5a55135639fbc4ca3ee0ce5a';
+      const subscriber = { user: '5a539449b689d341cccc4be7' };
+      const error = 'Something went wrong. Try again.';
+      let errorResponse;
+  
+      service.subscribe(eventId, subscriber).subscribe(res => {}, err => {
+        errorResponse = err;
+      });
+  
+      http
+        .expectOne('http://localhost:3000/api/events/' + eventId + '/subscribe')
+        .flush({message: error}, {status: 500, statusText: 'Server Error'});
+      expect(errorResponse.error.message).toEqual(error);
+      http.verify();
+    });
+  });
+
+
 });

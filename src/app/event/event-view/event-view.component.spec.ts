@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 
 import { EventViewComponent } from './event-view.component';
 import { ActivatedRoute } from '@angular/router';
@@ -43,7 +43,7 @@ describe('EventViewComponent', () => {
   let fixture: ComponentFixture<EventViewComponent>;
   let eventsService: EventsService;
 
-  beforeEach(async(() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [EventModule]
     })
@@ -52,11 +52,58 @@ describe('EventViewComponent', () => {
           providers: [
             { provide: ActivatedRoute, useClass: MockActivatedRoute },
             { provide: EventsService, useClass: MockEventsService }
-          ]
+          ],
+          template: `
+            <div class="container">
+              <div class="row">
+                <div class="col-md-8">
+                  <div *ngIf="event">
+                    <h3 class="event-name">{{event.title}}</h3>
+                    <div *ngIf="event.description">
+                      <label>Description:</label>
+                      <span class="description"> {{event.description}}</span>
+                    </div>
+                    <div>
+                      <label>Location:</label>
+                      <span class="location"> {{event.city}}, {{event.state}}</span>
+                    </div>
+                    <div>
+                      <label>Start:</label>
+                      <span class="start"> {{event.displayStart}}</span>
+                    </div>
+                    <div>
+                      <label>End:</label>
+                      <span class="end"> {{event.displayEnd}}</span>
+                    </div>
+                  </div>
+                </div>
+    
+                <div class="col-md-4">
+                <!--<app-member-list *ngIf="event"
+                                   [eventId]="eventId"
+                                   [creatorId]="event._creator"
+                                   [members]="event.members">
+              </app-member-list>-->
+                </div>
+              </div>
+    
+              <div class="row">
+                <div class="col-md-8">
+                  <!--<app-comment-create *ngIf="eventId"
+                                          [eventId]="eventId">
+                  </app-comment-create>-->
+                </div>
+    
+                <div class="col-md-4">
+                  <!--recommendations-list-->
+                </div>
+              </div>
+            </div>
+          `
         }
       })
       .compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(EventViewComponent);

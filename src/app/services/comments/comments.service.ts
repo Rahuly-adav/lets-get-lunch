@@ -16,6 +16,6 @@ export class CommentsService {
   }
 
   getEventComments(eventId: string): Observable<Comment[]> {
-    return this.http.get<Comment[]>('http:localhost:3000/api/comments/event/' + eventId);
+    return this.http.get<Comment[]>('http://localhost:3000/api/comments/event/' + eventId);
   }
 }

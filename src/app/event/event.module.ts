@@ -6,6 +6,8 @@ import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime-ex'
 import { EventRoutingModule } from './event-routing.module';
 import { EventCreateComponent } from './event-create/event-create.component';
 import { EventViewComponent } from './event-view/event-view.component';
+import { CommentCreateModule } from '../comment-create/comment-create.module';
+import { MemberListModule } from '../member-list/member-list.module';
 
 @NgModule({
   declarations: [EventCreateComponent, EventViewComponent],
@@ -15,7 +17,9 @@ import { EventViewComponent } from './event-view/event-view.component';
     ReactiveFormsModule,
     FormsModule,
     OwlDateTimeModule,
-    OwlNativeDateTimeModule 
+    OwlNativeDateTimeModule,
+    CommentCreateModule,
+    MemberListModule
   ]
 })
 export class EventModule { }

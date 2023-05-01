@@ -32,7 +32,7 @@ describe('CommentsService', () => {
         '_event': '5a55135639fbc4ca3ee0ce5a',
         'content': 'My first comment'
       };
-      const commentResponse: Comment = {
+      const commentResponse: any = {
         '__v': 0,
         'content': 'My first comment',
         'createdAt': '2018-01-09T19:42:08.048Z',
@@ -47,7 +47,7 @@ describe('CommentsService', () => {
       });
   
       http
-        .expectOne('https://ed-6356592084910080.educative.run:3000/api/comments')
+        .expectOne('http://localhost:3000/api/comments')
         .flush(commentResponse);
       expect(response).toEqual(commentResponse);
       http.verify();
@@ -57,7 +57,7 @@ describe('CommentsService', () => {
       const comment: Comment = {
         '_creator': '5a550ea739fbc4ca3ee0ce58',
         '_event': '5a55135639fbc4ca3ee0ce5a',
-        'content': undefined
+        'content': ''
       };
       const commentResponse = 'Comment could not be created!';
       let errorResponse: any;
@@ -67,7 +67,7 @@ describe('CommentsService', () => {
       });
   
       http
-        .expectOne('https://ed-6356592084910080.educative.run:3000/api/comments')
+        .expectOne('http://localhost:3000/api/comments')
         .flush(
           {message: commentResponse},
           {status: 500, statusText: 'Server Error'}
@@ -80,7 +80,7 @@ describe('CommentsService', () => {
   describe('getEventComments', () => {
     it('should return an array of comments with a valid event id', () => {
       const eventId = '5a55135639fbc4ca3ee0ce5a';
-      const commentResponse = [{
+      const commentResponse: any = [{
         '_id': '5a551b1039fbc4ca3ee0ce5b',
         'content': 'My first comment',
         'createdAt': '2018-01-09T19:42:08.048Z',
@@ -100,7 +100,7 @@ describe('CommentsService', () => {
       });
   
       http
-        .expectOne('https://ed-6356592084910080.educative.run:3000/api/comments/event/' + eventId)
+        .expectOne('http://localhost:3000/api/comments/event/' + eventId)
         .flush(commentResponse);
       expect(response).toEqual(commentResponse);
       http.verify();
@@ -116,7 +116,7 @@ describe('CommentsService', () => {
       });
   
       http
-        .expectOne('https://ed-6356592084910080.educative.run:3000/api/comments/event/' + eventId)
+        .expectOne('http://localhost:3000/api/comments/event/' + eventId)
         .flush(
           {message: commentResponse},
           {status: 500, statusText: 'Server Error'}

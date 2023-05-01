@@ -1,6 +1,8 @@
+import { User } from "../auth/user";
+
 export interface Comment {
     _event: string;
-    _creator: string|object;
+    _creator: User;
     content: string;
   
     createdAt?: string;

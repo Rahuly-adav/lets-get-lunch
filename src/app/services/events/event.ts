@@ -8,7 +8,7 @@ export interface Event {
     endTime: any;
     suggestLocations: Boolean;
 
-    members?: Array<any>;
+    members?: any;
     displayStart?: string;
     displayEnd?: string;
     start?: Date;

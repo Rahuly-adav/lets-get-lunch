@@ -34,5 +34,14 @@ describe('Navbar', () => {
     it('should redirect to dashboard when the navbar brand is clicked', () => {
       cy.get('.navbar-brand').click().url().should('include','/dashboard');
     });
+
+    it('should show a link to see all events', () => {
+      cy
+        .get('[data-test=events]')
+          .should('have.text', 'Events').click()
+          .url().should('include', '/events');
+    });
   });
+
+  
 })
